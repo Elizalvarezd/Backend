@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,6 +34,7 @@ public class ImagenController {
 
 
    @PostMapping("/crear")
+   @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ImagenSalidaDto> crearImagen(@RequestBody @Valid ImagenEntradaDto imagenEntradaDto) {
         return new ResponseEntity<>(imagenService.crearImagen(imagenEntradaDto), HttpStatus.CREATED);
     }

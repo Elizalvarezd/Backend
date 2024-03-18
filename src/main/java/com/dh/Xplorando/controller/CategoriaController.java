@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public class CategoriaController {
     }
 
     @PostMapping("/crear")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<CategoriaSalidaDto> crearCategoria(@Valid @RequestBody CategoriaEntradaDto categoriaEntradaDto) throws BadRequestException {
         return new ResponseEntity<>(iCategoriaService.crearCategoria(categoriaEntradaDto), HttpStatus.CREATED);
     }

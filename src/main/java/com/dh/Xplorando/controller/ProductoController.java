@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,6 +40,7 @@ public class ProductoController {
     }
 
     @PostMapping("/registrar")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ProductoSalidaDto> crearProducto(@Valid @RequestBody ProductoEntradaDto producto) throws BadRequestException, ResourceNotFoundException {
         return new ResponseEntity<>(productoService.crearProducto(producto), HttpStatus.CREATED);
     }
@@ -48,6 +50,7 @@ public class ProductoController {
     }
 
     @PutMapping("/editar")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ProductoSalidaDto> editarProducto(@Valid @RequestBody ProductoModificacionEntrada producto) throws ResourceNotFoundException {
         return new ResponseEntity<>(productoService.editarProducto(producto), HttpStatus.OK);
     }
