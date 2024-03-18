@@ -55,7 +55,18 @@ UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting user: " + e.getMessage());
         }
     }
-
+    @GetMapping("profile/{email}")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> getUserByID (@PathVariable("email") String email){
+        try{
+            User theUser = userService.getUser(email);
+            return ResponseEntity.ok(theUser);
+        }catch (UsernameNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching user");
+        }
+    }
 
 
 }
