@@ -2,9 +2,6 @@ package com.dh.Xplorando.request;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
-/**
- * @author Simpson Alfred
- */
 @Data
 public class LoginRequest {
     @NotBlank
