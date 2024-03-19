@@ -2,6 +2,7 @@ package com.dh.Xplorando.dto.salida;
 
 
 import com.dh.Xplorando.entity.Producto;
+import com.dh.Xplorando.entity.Producto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

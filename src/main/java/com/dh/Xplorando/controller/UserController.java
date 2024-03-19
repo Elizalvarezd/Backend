@@ -1,15 +1,11 @@
 package com.dh.Xplorando.controller;
 
-import com.dh.Xplorando.entity.Role;
 import com.dh.Xplorando.entity.User;
-import com.dh.Xplorando.exceptions.RoleAlreadyExistException;
-import com.dh.Xplorando.exceptions.UserAlreadyExistsException;
 import com.dh.Xplorando.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;

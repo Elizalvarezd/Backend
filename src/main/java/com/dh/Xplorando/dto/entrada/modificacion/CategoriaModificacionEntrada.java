@@ -13,7 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CategoriaModificacionEntrada {
-   @NotNull
+    @NotNull
     private Long id;
     @NotNull
     private String nombreCategoria;

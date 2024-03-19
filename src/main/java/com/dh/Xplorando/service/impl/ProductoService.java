@@ -22,31 +22,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductoService implements IProductoService {
     private final Logger LOGGER = LoggerFactory.getLogger(ProductoService.class);
 
     private final ProductoRepository productoRepository;
-
     private final CategoriaRepository categoriaRepository;
-    //CAMBIO
     private final ImagenRepository imagenRepository;
-
     private final CaracteristicaRepository caracteristicaRepository;
-
     private final ModelMapper modelMapper;
     private final CategoriaService categoriaService;
-
     private final ImagenService imagenService;
 
-
-
-    //@Autowired se utiliza para inyectar objetos en otros objetos. Esto permite un acoplamiento suelto entre componentes y ayuda a mantener el código más mantenible.
     @Autowired
     public ProductoService(ProductoRepository productoRepository, CategoriaRepository categoriaRepository, ImagenRepository imagenRepository, CaracteristicaRepository caracteristicaRepository, ModelMapper modelMapper, CategoriaService categoriaService, ImagenService imagenService) {
         this.productoRepository = productoRepository;
@@ -56,71 +46,18 @@ public class ProductoService implements IProductoService {
         this.modelMapper = modelMapper;
         this.categoriaService = categoriaService;
         this.imagenService = imagenService;
-        configureMapping();
     }
-
-    //LISTAR-DETALALR (MEDIA)
-  /*  @Override
-    public List<ProductoSalidaDto> listarProductos() {
-        List<ProductoSalidaDto> productos = productoRepository.findAll().stream().map(this::entidadAProductoSalidaDto).toList();
-        LOGGER.info("lista de todos los paquetes disponibles :{}", productos);
-        return productos;
-    }*/
 
     @Override
     public List<ProductoSalidaDto> listarProductos() {
         List<ProductoSalidaDto> productos = productoRepository.findAll().stream().map(this::entidadADto).toList();
-        LOGGER.info("LISTA DE LOS PRODUCTOS DISPONIBLES : {}", productos);
+        LOGGER.info("LISTA DE LOS PRODUCTOS DISPONIBLES : {}" + productos);
         return productos;
     }
 
-    //CREAR-REGISTRAR PRODUCTO (ALTA)
-   /* @Override
-    public ProductoSalidaDto crearProducto(ProductoEntradaDto productoEntradaDto) throws BadRequestException, DataIntegrityViolationException {
-        Categoria categoria = categoriaRepository.findById(productoEntradaDto.getCategoriaId()).orElseThrow(() -> {
-                    LOGGER.error("categoría no existe");
-                    return new BadRequestException("categoría no existe");
-                });
-
-       /* if (categoria == null) {
-            LOGGER.error("No se encuentra la Categoría en nuestra BDD");
-            throw new BadRequestException("No se encuentra la Categoría en nuestra BDD");
-        }
-*//*
-
-        modelMapper.getConfiguration().setAmbiguityIgnored(true);
-        Producto productoEntidad = modelMapper.map(productoEntradaDto, Producto.class);
-        productoEntidad.setCategoria(categoria);
-       // productoEntidad.setId(Long.parseLong("0"));
-        List<Imagen> imagenesList = new ArrayList<>();
-        for (ImagenEntradaDto imagenEntradaDto : productoEntradaDto.getImagenes()) {
-            Imagen imagenEntidad = modelMapper.map(imagenEntradaDto, Imagen.class);
-            LOGGER.info("imagen :" + imagenEntidad);
-            imagenEntidad.setProducto(productoEntidad);
-            imagenesList.add(imagenEntidad);
-        }
-        productoEntidad.setImagenes(imagenesList);
-        Producto productoCreado = productoRepository.save(productoEntidad);
-      //  productoCreado.setCategoria(categoria);
-
-        Producto producto = productoRepository.findById(productoCreado.getId()).orElse(null);
-
-
-        ProductoSalidaDto productoSalidaDto = entidadADto(producto);
-        LOGGER.info("Nuevo producto registrado con exito: {}", productoSalidaDto);
-
-        return productoSalidaDto;
-    }
-    */
     @Override
     public ProductoSalidaDto crearProducto(ProductoEntradaDto productoEntradaDto) throws BadRequestException, DataIntegrityViolationException, ResourceNotFoundException {
 
-       /* Categoria categoria = categoriaRepository.findById(productoEntradaDto.getCategoriaId())
-                .orElseThrow(() -> {
-                    LOGGER.error("categoría no existe");
-                    return new BadRequestException("Ncateroría no exist");
-                });
-                */
         String categoriaId = productoEntradaDto.getCategoriaString();
         Categoria categoria = categoriaRepository.findByNombreCategoria(categoriaId);
         if (categoria == null) {
@@ -162,94 +99,81 @@ public class ProductoService implements IProductoService {
         return productoSalidaDto;
     }
 
+
     @Override
-    public ProductoSalidaDto editarProducto(ProductoModificacionEntrada productoModificacionEntrada) throws ResourceNotFoundException {
-        Producto productoAModificar= productoRepository.findById(productoModificacionEntrada.getId()).orElse(null);
-        ProductoSalidaDto productoSalidaDto = null;
-        if(productoAModificar != null){
+    public ProductoSalidaDto editarProducto(ProductoModificacionEntrada productoModificacionEntradaDto) throws ResourceNotFoundException {
+        LOGGER.info("PRODUCTO A MODIFICAR: " + productoModificacionEntradaDto);  //entra sin imágenes
+        Long buscarProductoId = productoModificacionEntradaDto.getId();
+        Optional<Producto> productoBuscado = productoRepository.findById(buscarProductoId);
 
-            productoAModificar.setCategoria(modelMapper.map(categoriaService.buscarCategoriaPorId(productoModificacionEntrada.getCategoriaId()), Categoria.class));
-            productoRepository.save(productoAModificar);
+        // Verificar si el producto buscado está presente
+        if (!productoBuscado.isPresent()) {
+            throw new ResourceNotFoundException("No se encontró el producto con el ID proporcionado: " + buscarProductoId);
+        }
+        LOGGER.info("PRODUCTO: " + productoBuscado);
 
-            productoSalidaDto = entidadADto(productoAModificar);
-            LOGGER.warn("SE HA MODIFICADO EL PRODUCTO {}", productoSalidaDto);
+        String categoriaTitulo = productoModificacionEntradaDto.getCategoriaString();
+        Categoria categoria = categoriaRepository.findByNombreCategoria(categoriaTitulo);
+
+        // Verificar si se encontró la categoría
+        if (categoria == null) {
+            throw new ResourceNotFoundException("No se encontró la categoría con el nombre proporcionado: " + categoriaTitulo);
         }
-        else {
-            LOGGER.error("NO SE HA PODIDO MODIFICAR EL PRODUCTO");
-            throw new ResourceNotFoundException("NNO SE HA PODIDO MODIFICAR EL PRODUCTO");
-        }
+
+        // Obtener el producto de la base de datos
+        Producto productoExistente = productoBuscado.get();
+
+        // Actualizar los campos del producto existente
+        productoExistente.setCodigoProducto(productoModificacionEntradaDto.getCodigoProducto());
+        productoExistente.setNombreProducto(productoModificacionEntradaDto.getNombreProducto());
+        productoExistente.setDescripcionProducto(productoModificacionEntradaDto.getDescripcionProducto());
+        productoExistente.setPrecioProducto(productoModificacionEntradaDto.getPrecioProducto());
+        productoExistente.setDireccion(productoModificacionEntradaDto.getDireccion());
+        productoExistente.setCategoria(categoria);  // Actualizar la categoría
+
+        // Guardar el producto modificado
+        Producto guardarProducto = productoRepository.save(productoExistente);
+        LOGGER.info("PRODUCTO GUARDADO: " + guardarProducto);
+
+        // Mapear el producto guardado a ProductoSalidaDto
+        ProductoSalidaDto productoSalidaDto = entidadADto(guardarProducto);
+        LOGGER.info("PRODUCTO SALIDA: " + productoSalidaDto);
+
+        LOGGER.info("El producto " + productoExistente + " fue modificado exitosamente ");
 
         return productoSalidaDto;
     }
 
 
+    @Override
+    public void eliminarProductoPorId(Long id) throws ResourceNotFoundException {
 
-    //BUSCAR PRODUCTO (MEDIA)
-   /* @Override
+    }
+
+    @Override
     public ProductoSalidaDto buscarProductoPorId(Long id){
         Producto productoBuscado = productoRepository.findById(id).orElse(null);
-        ProductoSalidaDto productoSalidaDto = null;
-
+        ProductoSalidaDto productoEncontrado = null;
         if (productoBuscado != null) {
-            productoSalidaDto = entidadADto(productoBuscado);
-            LOGGER.info("Se ha encontrado el paquete ", productoSalidaDto);
+            //cambie entidad a dto
+            productoEncontrado = entidadADto(productoBuscado);
+            LOGGER.info("Se ha encontrado el paquete: " + productoEncontrado);
         } else {
             LOGGER.error("No se ha encontrado en la BDD un paquete con ese id " + id);
         }
-        return productoSalidaDto;
+        return productoEncontrado;
     }
-*/
-
-    //MAPEO
-  /* private void configureMapping() {
-
-       modelMapper.typeMap(ProductoEntradaDto.class, Producto.class)
-                .addMappings(mapper -> mapper.map(ProductoEntradaDto::getImagenEntradaDto, Producto::setImagenes));
-        modelMapper.typeMap(Producto.class, ProductoSalidaDto.class)
-                .addMappings(mapper -> mapper.map(Producto::getImagenes, ProductoSalidaDto::setImagenSalidaDto));
-
-
-
-        //traer de que categoría es
-       modelMapper.typeMap(ProductoEntradaDto.class, Producto.class)
-                .addMappings(mapper -> mapper.map(ProductoEntradaDto::getCategoriaEntradaDto, Producto::setCategoria));
-        modelMapper.typeMap(Producto.class, ProductoSalidaDto.class)
-                .addMappings(mapper -> mapper.map(Producto::getCategoria, ProductoSalidaDto::setCategoriaSalidaDto));*/
-    //}
-
-    @Override
-    public void eliminarProductoPorId(Long id) throws ResourceNotFoundException {
-
-    }
-
-   /* private Producto productoEntradaDtoaEntidad(ProductoEntradaDto productoEntradaDto) {
-        return modelMapper.map(productoEntradaDto, Producto.class);
-    }
-
-    private ProductoSalidaDto entidadAProductoSalidaDto(Producto producto) {
-        return modelMapper.map(producto, ProductoSalidaDto.class);
-    }
-*/
-
-  /*  @Override
-    public void eliminarProductoPorId(Long id) throws ResourceNotFoundException {
-
-    }*/
-
-    @Override
-    public ProductoSalidaDto buscarProductoPorId(Long id) throws ResourceNotFoundException {
-        return null;
-    }
-
 
     private void configureMapping(){
         modelMapper.typeMap(Producto.class, ProductoSalidaDto.class)
                 .addMappings(mapper ->
                 {
+                    mapper.map(Producto::getCategoria,ProductoSalidaDto::setCategoriaSalidaDto);
                     mapper.map(Producto::getCaracteristicas,ProductoSalidaDto::setCaracteristicaSalidaDtos);
                 });
 
     }
+
 
     private CategoriaProductoSalidaDto categoriaSalidaDtoASalidaProductoDto(Long id) {
         return modelMapper.map(categoriaService.buscarCategoriaPorId(id), CategoriaProductoSalidaDto.class);
@@ -266,25 +190,32 @@ public class ProductoService implements IProductoService {
         return imagenListDto;
     }
 
-
+    public Producto dtoModificacionAentidad (ProductoModificacionEntrada productoModificacionEntrada){
+        return modelMapper.map(productoModificacionEntrada,Producto.class);
+    }
 
     private ProductoSalidaDto entidadADto(Producto producto) {
         ProductoSalidaDto productoSalidaDto = modelMapper.map(producto, ProductoSalidaDto.class);
-        productoSalidaDto.setCategoriaProductoSalidaDto(categoriaSalidaDtoASalidaProductoDto(producto.getCategoria().getId()));
 
-        var imagenSalidaDtoList = imagenSalidaDtoASalidaProductoDto(producto.getImagenes());
+        // Mapear la categoría si existe
+        if (producto.getCategoria() != null) {
+            CategoriaSalidaDto categoriaSalidaDto = modelMapper.map(producto.getCategoria(), CategoriaSalidaDto.class);
+            productoSalidaDto.setCategoriaSalidaDto(categoriaSalidaDto);
+        }
+
+        // Mapear las características si existen
+        if (!producto.getCaracteristicas().isEmpty()) {
+            Set<CaracteristicaSalidaDto> caracteristicaSalidaDtos = producto.getCaracteristicas().stream()
+                    .map(caracteristica -> modelMapper.map(caracteristica, CaracteristicaSalidaDto.class))
+                    .collect(Collectors.toSet());
+            productoSalidaDto.setCaracteristicaSalidaDtos(caracteristicaSalidaDtos);
+        }
+
+        // Mapear las imágenes si existen
+        List<ImagenSalidaDto> imagenSalidaDtoList = producto.getImagenes().stream()
+                .map(imagen -> modelMapper.map(imagen, ImagenSalidaDto.class))
+                .collect(Collectors.toList());
         productoSalidaDto.setImagenSalidaDtoList(imagenSalidaDtoList);
-
-
-      /* seteo las img?
-      var imagenSalidaDtoList = imagenSalidaDtoASalidaProductoDto(producto.getImagenes());
-              if (!imagenSalidaDtoList.isEmpty()) {
-            ImagenSalidaDto primeraImagen = imagenSalidaDtoList.get(0);
-            productoSalidaDto.setImagenSalidaDtoList(primeraImagen.getUrlImagen());
-            productoSalidaDto.setImagenSalidaDtoList(primeraImagen.getId());
-            }
-            productoSalidaDto.setImagenSalidaDtoList(imagenSalidaDtoList);
-       */
 
         return productoSalidaDto;
     }

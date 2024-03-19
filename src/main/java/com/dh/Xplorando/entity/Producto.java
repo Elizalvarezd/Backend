@@ -13,7 +13,7 @@ import java.util.Set;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
+
 
 @Entity
 @Table(name="PRODUCTOS")
@@ -32,8 +32,8 @@ public class Producto {
     @Column(name="DIRECCION")
     private String direccion;
 
-  @OneToMany(mappedBy ="producto", fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-   private List<Imagen> imagenes ;
+    @OneToMany(mappedBy ="producto", fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    private List<Imagen> imagenes ;
 
     @ManyToOne // (fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn(name = "categoria_id") //referencedColumnName = "id"

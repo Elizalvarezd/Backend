@@ -10,11 +10,14 @@ import org.apache.coyote.BadRequestException;
 import java.util.List;
 
 public interface IProductoService {
-   List<ProductoSalidaDto> listarProductos();
+    List<ProductoSalidaDto> listarProductos();
     ProductoSalidaDto crearProducto(ProductoEntradaDto producto) throws BadRequestException, ResourceNotFoundException;
 
     ProductoSalidaDto editarProducto(ProductoModificacionEntrada productoModificacionEntrada) throws ResourceNotFoundException;
+
+
     void eliminarProductoPorId(Long id) throws ResourceNotFoundException;
-   ProductoSalidaDto buscarProductoPorId(Long id)throws ResourceNotFoundException;
+    ProductoSalidaDto buscarProductoPorId(Long id)throws ResourceNotFoundException;
+
 
 }

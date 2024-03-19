@@ -1,6 +1,7 @@
 package com.dh.Xplorando.dto.entrada;
 
 
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;

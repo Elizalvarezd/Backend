@@ -21,14 +21,13 @@ public class CaracteristicaController {
 
     private final ICaracteristicaService iCaracteristicaService;
 
-        @PostMapping("/crear")
-        @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("/crear")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<CaracteristicaSalidaDto> crearCaracteristica(@Valid @RequestBody CaracteristicaEntradaDto caracteristicaEntradaDto) throws ResourceNotFoundException {
         return new ResponseEntity<>(iCaracteristicaService.crearCaracteristica(caracteristicaEntradaDto) ,  HttpStatus.CREATED);
     }
 
     @GetMapping("/listar")
-
     public ResponseEntity<List<CaracteristicaSalidaDto>> listarCaracteristicas(){
         return new ResponseEntity<>(iCaracteristicaService.listarCaracteristicas(), HttpStatus.OK);
     }

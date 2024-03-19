@@ -33,13 +33,13 @@ public class ImagenController {
     }
 
 
-   @PostMapping("/crear")
-   @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("/crear")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ImagenSalidaDto> crearImagen(@RequestBody @Valid ImagenEntradaDto imagenEntradaDto) {
         return new ResponseEntity<>(imagenService.crearImagen(imagenEntradaDto), HttpStatus.CREATED);
     }
 
-        public static String UPLOAD_DIRECTORY = "/uploads";
+    public static String UPLOAD_DIRECTORY = "/uploads";
 
     /*  @GetMapping("/uploadimage") public String displayUploadForm() {
             return "imageupload/index";
