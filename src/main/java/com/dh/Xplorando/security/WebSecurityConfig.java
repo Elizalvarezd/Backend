@@ -58,7 +58,10 @@ public class WebSecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers("/auth/**", "/roles/create-new-role","/users/**", "/productos/listar","/categorias/listar","/caracteristicas/listar", "/swagger-ui/**").permitAll()// Permitir acceso sin autenticación a URLs específicas
+                        //cambio /productos/{id}
+                        .requestMatchers("/auth/**", "/roles/create-new-role","/users/**","/productos/**", "/categorias/listar","/caracteristicas/listar", "/swagger-ui/**").permitAll()// Permitir acceso sin autenticación a URLs específicas
+
+
 
                         .requestMatchers("/auth/**","/roles/**","/users/**","/productos/**","/imagenes/**", "/categorias/**", "/caracteristicas/**").hasRole("ADMIN")// Requiere rol ADMIN para URLs específicas
 

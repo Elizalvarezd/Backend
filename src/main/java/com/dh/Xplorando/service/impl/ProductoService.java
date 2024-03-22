@@ -102,7 +102,10 @@ public class ProductoService implements IProductoService {
 
     @Override
     public ProductoSalidaDto editarProducto(ProductoModificacionEntrada productoModificacionEntradaDto) throws ResourceNotFoundException {
-        LOGGER.info("PRODUCTO A MODIFICAR: " + productoModificacionEntradaDto);  //entra sin imágenes
+        LOGGER.info("PRODUCTO A MODIFICAR: " + productoModificacionEntradaDto);
+
+
+        //entra sin imágenes
         Long buscarProductoId = productoModificacionEntradaDto.getId();
         Optional<Producto> productoBuscado = productoRepository.findById(buscarProductoId);
 
@@ -147,7 +150,13 @@ public class ProductoService implements IProductoService {
 
     @Override
     public void eliminarProductoPorId(Long id) throws ResourceNotFoundException {
-
+        Producto productoBuscado = productoRepository.findById(id).orElse(null);
+        if (productoBuscado !=null){
+            productoRepository.deleteById(id);
+            LOGGER.warn("Se eliminó el producto con id: " + productoBuscado);
+        } else
+            throw new ResourceNotFoundException("No se encontró el producto en la base de datos");
+        LOGGER.error("No se encontró el producto en la base de datos");
     }
 
     @Override
@@ -163,6 +172,8 @@ public class ProductoService implements IProductoService {
         }
         return productoEncontrado;
     }
+
+
 
     private void configureMapping(){
         modelMapper.typeMap(Producto.class, ProductoSalidaDto.class)

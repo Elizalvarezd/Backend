@@ -22,6 +22,8 @@ public class Categoria {
     @Column(name="NOMBRE", unique = true)
     private String nombreCategoria;
 
+    @Column(name="IMAGEN")
+    private String imagenCategoria;
     @OneToMany(mappedBy = "categoria", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Producto> productos ;
 

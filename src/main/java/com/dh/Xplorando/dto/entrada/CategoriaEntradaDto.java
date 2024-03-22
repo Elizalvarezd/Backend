@@ -24,4 +24,6 @@ public class CategoriaEntradaDto {
     @NotBlank(message = "Debe completar con un nombre de Categoria")
     private String nombreCategoria;
 
+
+
 }
