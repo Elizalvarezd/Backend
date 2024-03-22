@@ -19,6 +19,6 @@ public class CategoriaSalidaDto {
     private Long id;
 
     private String nombreCategoria;
-
+    private String imagenCategoria;
 
 }

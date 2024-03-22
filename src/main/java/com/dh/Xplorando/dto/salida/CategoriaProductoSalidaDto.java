@@ -15,6 +15,6 @@ public class CategoriaProductoSalidaDto {
     private Long id;
 
     private String nombreCategoria;
-
+    private String imagenCategoria;
 
 }
