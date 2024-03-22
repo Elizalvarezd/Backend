@@ -52,26 +52,20 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer :: disable)
+        http.csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(
                         exception -> exception.authenticationEntryPoint(jwtAuthEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
 
-<<<<<<< HEAD
-                        //cambio /productos/{id}
-                        .requestMatchers("/auth/**", "/roles/create-new-role","/users/**","/productos/**", "/categorias/listar","/caracteristicas/listar", "/swagger-ui/**").permitAll()// Permitir acceso sin autenticación a URLs específicas
+                        .requestMatchers("/auth/**", "/roles/create-new-role","/users/**", "/productos/listar","/categorias/listar","/caracteristicas/listar","/reservas/**" ,"/swagger-ui/*", "/v3/api-docs/*", "/swagger-ui.html").permitAll()// Permitir acceso sin autenticación a URLs específicas
 
-
-=======
-                        .requestMatchers("/auth/**", "/roles/create-new-role","/users/**", "/productos/**","/categorias/listar","/caracteristicas/listar", "/swagger-ui/**").permitAll()// Permitir acceso sin autenticación a URLs específicas
->>>>>>> e3be586643202f9ac25110d81085388d14f49d53
-
-                        .requestMatchers("/auth/**","/roles/**","/users/**","/productos/**","/imagenes/**", "/categorias/**", "/caracteristicas/**").hasRole("ADMIN")// Requiere rol ADMIN para URLs específicas
+                        .requestMatchers("/auth/**","/roles/**","/users/**","/productos/**","/reservas/listar","/imagenes/**", "/reservas/**","/categorias/**","/caracteristicas/**").hasRole("ADMIN")// Requiere rol ADMIN para URLs específicas
 
                         .anyRequest().authenticated());// Requiere autenticación para todas las demás URLs
 
         http.authenticationProvider(authenticationProvider());
+
         http.addFilterBefore(authenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
