@@ -69,5 +69,12 @@ public class ProductoController {
         return new ResponseEntity<>(productoService.buscarProductoPorId(id), HttpStatus.OK);
     }
 
+    //metodo get por ubicacion (ciudad)
+    @GetMapping("/buscarPorUbicacion/{id}")
+    public ResponseEntity <List<Producto>> buscarProductosXIdciudad(@PathVariable("id") Long id) throws ResourceNotFoundException {
+        Optional<List<Producto>> productosBuscados=productoService.listarProductoXUbicacion(id);
+        return productosBuscados.map(ResponseEntity::ok).orElseGet(()-> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
 }
 

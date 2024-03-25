@@ -1,5 +1,6 @@
 package com.dh.Xplorando.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
@@ -53,10 +54,12 @@ public class Producto {
             name="productos_caracteristicas",
             joinColumns = @JoinColumn(name = "producto_id"),
             inverseJoinColumns = @JoinColumn(name = "caracteristica_id")
-    )
-    //quiero añadir caracteristicas a esta lista
+    )//quiero añadir caracteristicas a esta lista
     private Set<Caracteristica> caracteristicas = new HashSet<>();
 
+    @OneToMany(mappedBy = "producto",fetch =FetchType.LAZY)
+    @JsonIgnoreProperties(value = {"producto","usuario"})
+    private Set<Reserva> reservas =new HashSet<>();
 
 
 }

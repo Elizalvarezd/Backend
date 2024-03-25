@@ -17,6 +17,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import javax.swing.*;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -183,6 +184,19 @@ public class ProductoService implements IProductoService {
             LOGGER.error("No se ha encontrado en la BDD un paquete con ese id " + id);
         }
         return productoEncontrado;
+    }
+    @Override
+    public Optional<Producto> buscarProductoXId(Long id){
+        return productoRepository.findById(id);
+    }
+    @Override
+    public Optional<List<Producto>> listarProductoXUbicacion(Long id) throws ResourceNotFoundException {
+        return productoRepository.findAllByUbicacionId(id);
+    }
+
+    //buscar producto por su ubicacion junto a las dos fechas que yo le pase
+    public Optional <List<Producto>> listarProductosXUbicacionFechas(Long id ,LocalDate fechaInicio, LocalDate fechaFinal){
+        return productoRepository.findProductoXFechas(fechaInicio,fechaFinal,id);
     }
 
 

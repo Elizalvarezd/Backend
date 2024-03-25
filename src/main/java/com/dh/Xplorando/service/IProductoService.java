@@ -7,7 +7,9 @@ import com.dh.Xplorando.entity.Producto;
 import com.dh.Xplorando.exceptions.ResourceNotFoundException;
 import org.apache.coyote.BadRequestException;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface IProductoService {
     List<ProductoSalidaDto> listarProductos();
@@ -17,8 +19,11 @@ public interface IProductoService {
 
     void eliminarProductoPorId(Long id) throws ResourceNotFoundException;
     ProductoSalidaDto buscarProductoPorId(Long id)throws ResourceNotFoundException;
+    Optional<Producto> buscarProductoXId(Long id);
+    //buscar producto por su ubicacion
+    Optional<List<Producto>> listarProductoXUbicacion(Long id) throws ResourceNotFoundException;
 
-
-
+    //buscar producto por su ubicacion junto a las dos fechas que yo le pase
+    Optional <List<Producto>> listarProductosXUbicacionFechas(Long id , LocalDate fechaInicio, LocalDate fechaFinal);
 
 }

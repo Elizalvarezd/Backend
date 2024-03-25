@@ -1,5 +1,6 @@
 package com.dh.Xplorando.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,6 +8,7 @@ import lombok.Setter;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 
 @Entity
@@ -29,4 +31,10 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
 
     private Collection<Role> roles = new HashSet<>();
+
+
+    @OneToMany(mappedBy = "usuario",fetch =FetchType.LAZY)
+    @JsonIgnoreProperties(value = {"usuario"})
+    private Set<Reserva> reservas =new HashSet<>();
+
 }
