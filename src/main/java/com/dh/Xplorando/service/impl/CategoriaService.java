@@ -86,5 +86,4 @@ public class CategoriaService implements ICategoriaService {
         return modelMapper.map(categoria, CategoriaSalidaDto.class);
     }
 
-
 }

@@ -45,6 +45,10 @@ public class ProductoModificacionEntrada {
     @JsonProperty("categoria")
     private String categoriaString;
 
+    @NotNull(message = "El nombre de la ubicacion no puede ser nulo")
+    @JsonProperty("ubicacion")
+    private String ubicacionString;
+
     @JsonProperty("caracteristicas")
     private Set<CaracteristicaEntradaDto> caracteristicaEntradaDtos = new HashSet<>();
 }

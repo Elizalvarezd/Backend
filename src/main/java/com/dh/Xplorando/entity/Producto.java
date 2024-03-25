@@ -1,5 +1,6 @@
 package com.dh.Xplorando.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -21,8 +22,6 @@ public class Producto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name="CODIGO", unique = true)
-    private int codigoProducto;
     @Column(name="NOMBRE",unique = true)
     private String nombreProducto;
     @Column(name="DESCRIPCION")
@@ -39,6 +38,10 @@ public class Producto {
     @JoinColumn(name = "categoria_id") //referencedColumnName = "id"
     private Categoria categoria;
 
+    @ManyToOne // (fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @JoinColumn(name = "ubicacion_id") //referencedColumnName = "id"
+    private Ubicacion ubicacion;
+
     //The owner side is where we configure the relationship.
     //We can do this with the @JoinTable annotation
     //https://www.baeldung.com/jpa-many-to-many
@@ -51,7 +54,6 @@ public class Producto {
             joinColumns = @JoinColumn(name = "producto_id"),
             inverseJoinColumns = @JoinColumn(name = "caracteristica_id")
     )
-
     //quiero añadir caracteristicas a esta lista
     private Set<Caracteristica> caracteristicas = new HashSet<>();
 

@@ -3,12 +3,15 @@ package com.dh.Xplorando.controller;
 import com.dh.Xplorando.dto.entrada.ProductoEntradaDto;
 import com.dh.Xplorando.dto.entrada.modificacion.ProductoModificacionEntrada;
 import com.dh.Xplorando.dto.salida.ProductoSalidaDto;
+import com.dh.Xplorando.entity.Producto;
 import com.dh.Xplorando.exceptions.ResourceNotFoundException;
 import com.dh.Xplorando.service.IProductoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Optional;
+
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -61,11 +64,10 @@ public class ProductoController {
         return new ResponseEntity<>("Paquete eliminado correctamente", HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/buscarPorId/{id}")
     public ResponseEntity<ProductoSalidaDto> buscarProductoPorId(@PathVariable Long id) throws ResourceNotFoundException {
         return new ResponseEntity<>(productoService.buscarProductoPorId(id), HttpStatus.OK);
     }
-
 
 }
 

@@ -37,6 +37,9 @@ public class ProductoSalidaDto {
     @JsonProperty("categoria")
     private CategoriaSalidaDto categoriaSalidaDto;
 
+    @JsonProperty("ubicacion")
+    private UbicacionSalidaDto ubicacionSalidaDto;
+
     @JsonProperty("caracteristicas")
     private Set<CaracteristicaSalidaDto> caracteristicaSalidaDtos= new HashSet<>();
 

@@ -4,15 +4,9 @@ import com.dh.Xplorando.dto.entrada.ImagenEntradaDto;
 import com.dh.Xplorando.dto.entrada.ProductoEntradaDto;
 import com.dh.Xplorando.dto.entrada.modificacion.ProductoModificacionEntrada;
 import com.dh.Xplorando.dto.salida.*;
-import com.dh.Xplorando.entity.Caracteristica;
-import com.dh.Xplorando.entity.Categoria;
-import com.dh.Xplorando.entity.Imagen;
-import com.dh.Xplorando.entity.Producto;
+import com.dh.Xplorando.entity.*;
 import com.dh.Xplorando.exceptions.ResourceNotFoundException;
-import com.dh.Xplorando.repository.CaracteristicaRepository;
-import com.dh.Xplorando.repository.CategoriaRepository;
-import com.dh.Xplorando.repository.ImagenRepository;
-import com.dh.Xplorando.repository.ProductoRepository;
+import com.dh.Xplorando.repository.*;
 import com.dh.Xplorando.service.IProductoService;
 import org.apache.coyote.BadRequestException;
 import org.modelmapper.ModelMapper;
@@ -22,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import javax.swing.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,20 +26,24 @@ public class ProductoService implements IProductoService {
 
     private final ProductoRepository productoRepository;
     private final CategoriaRepository categoriaRepository;
+    private final UbicacionRepository ubicacionRepository;
     private final ImagenRepository imagenRepository;
     private final CaracteristicaRepository caracteristicaRepository;
     private final ModelMapper modelMapper;
     private final CategoriaService categoriaService;
+    private final UbicacionService ubicacionService;
     private final ImagenService imagenService;
 
     @Autowired
-    public ProductoService(ProductoRepository productoRepository, CategoriaRepository categoriaRepository, ImagenRepository imagenRepository, CaracteristicaRepository caracteristicaRepository, ModelMapper modelMapper, CategoriaService categoriaService, ImagenService imagenService) {
+    public ProductoService(ProductoRepository productoRepository, CategoriaRepository categoriaRepository, UbicacionRepository ubicacionRepository, ImagenRepository imagenRepository, CaracteristicaRepository caracteristicaRepository, ModelMapper modelMapper, CategoriaService categoriaService, UbicacionService ubicacionService, ImagenService imagenService) {
         this.productoRepository = productoRepository;
         this.categoriaRepository = categoriaRepository;
+        this.ubicacionRepository = ubicacionRepository;
         this.imagenRepository = imagenRepository;
         this.caracteristicaRepository = caracteristicaRepository;
         this.modelMapper = modelMapper;
         this.categoriaService = categoriaService;
+        this.ubicacionService = ubicacionService;
         this.imagenService = imagenService;
     }
 
@@ -64,6 +63,12 @@ public class ProductoService implements IProductoService {
             throw new ResourceNotFoundException("No se encontró la categoría con el nombre proporcionado: " + categoriaId);
         }
 
+        String ubicacionId = productoEntradaDto.getUbicacionString();
+        Ubicacion ubicacion = ubicacionRepository.findByCiudad(ubicacionId);
+        if (ubicacion == null) {
+            throw new ResourceNotFoundException("No se encontró la ubicacion con el nombre proporcionado: " + ubicacionId);
+        }
+
         Set<Caracteristica> caracteristicasList = new HashSet<>();
         Set<String> arrayDeCaracteristicas = productoEntradaDto.getCaracteristica_nombre();
         for (String caracteristica : arrayDeCaracteristicas){
@@ -77,6 +82,7 @@ public class ProductoService implements IProductoService {
 
         Producto productoEntidad = modelMapper.map(productoEntradaDto, Producto.class);
         productoEntidad.setCategoria(categoria);
+        productoEntidad.setUbicacion(ubicacion);
         productoEntidad.setCaracteristicas(caracteristicasList);
 
 
@@ -117,22 +123,28 @@ public class ProductoService implements IProductoService {
 
         String categoriaTitulo = productoModificacionEntradaDto.getCategoriaString();
         Categoria categoria = categoriaRepository.findByNombreCategoria(categoriaTitulo);
-
         // Verificar si se encontró la categoría
         if (categoria == null) {
             throw new ResourceNotFoundException("No se encontró la categoría con el nombre proporcionado: " + categoriaTitulo);
+        }
+
+        String ubicacionCiudad = productoModificacionEntradaDto.getUbicacionString();
+        Ubicacion ubicacion = ubicacionRepository.findByCiudad(ubicacionCiudad);
+        // Verificar si se encontró la ubicacion
+        if (ubicacion == null) {
+            throw new ResourceNotFoundException("No se encontró la ubicacion con el nombre proporcionado: " + ubicacionCiudad);
         }
 
         // Obtener el producto de la base de datos
         Producto productoExistente = productoBuscado.get();
 
         // Actualizar los campos del producto existente
-        productoExistente.setCodigoProducto(productoModificacionEntradaDto.getCodigoProducto());
         productoExistente.setNombreProducto(productoModificacionEntradaDto.getNombreProducto());
         productoExistente.setDescripcionProducto(productoModificacionEntradaDto.getDescripcionProducto());
         productoExistente.setPrecioProducto(productoModificacionEntradaDto.getPrecioProducto());
         productoExistente.setDireccion(productoModificacionEntradaDto.getDireccion());
         productoExistente.setCategoria(categoria);  // Actualizar la categoría
+        productoExistente.setUbicacion(ubicacion);
 
         // Guardar el producto modificado
         Producto guardarProducto = productoRepository.save(productoExistente);
@@ -174,12 +186,12 @@ public class ProductoService implements IProductoService {
     }
 
 
-
     private void configureMapping(){
         modelMapper.typeMap(Producto.class, ProductoSalidaDto.class)
                 .addMappings(mapper ->
                 {
                     mapper.map(Producto::getCategoria,ProductoSalidaDto::setCategoriaSalidaDto);
+                    mapper.map(Producto::getUbicacion,ProductoSalidaDto::setUbicacionSalidaDto);
                     mapper.map(Producto::getCaracteristicas,ProductoSalidaDto::setCaracteristicaSalidaDtos);
                 });
 
@@ -188,6 +200,10 @@ public class ProductoService implements IProductoService {
 
     private CategoriaProductoSalidaDto categoriaSalidaDtoASalidaProductoDto(Long id) {
         return modelMapper.map(categoriaService.buscarCategoriaPorId(id), CategoriaProductoSalidaDto.class);
+    }
+
+    private UbicacionProductoSalidaDto ubicacionSalidaDtoASalidaProductoDto(Long id) {
+        return modelMapper.map(ubicacionService.buscarUbicacionXId(id), UbicacionProductoSalidaDto.class);
     }
 
     private List<ImagenSalidaDto> imagenSalidaDtoASalidaProductoDto(List<Imagen> imagenList) {
@@ -212,6 +228,12 @@ public class ProductoService implements IProductoService {
         if (producto.getCategoria() != null) {
             CategoriaSalidaDto categoriaSalidaDto = modelMapper.map(producto.getCategoria(), CategoriaSalidaDto.class);
             productoSalidaDto.setCategoriaSalidaDto(categoriaSalidaDto);
+        }
+
+        // Mapear la ubicacion si existe
+        if (producto.getUbicacion() != null) {
+            UbicacionSalidaDto ubicacionSalidaDto = modelMapper.map(producto.getUbicacion(), UbicacionSalidaDto.class);
+            productoSalidaDto.setUbicacionSalidaDto(ubicacionSalidaDto);
         }
 
         // Mapear las características si existen

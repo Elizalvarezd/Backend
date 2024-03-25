@@ -47,6 +47,10 @@ public class ProductoEntradaDto {
     @JsonProperty("categoria")
     private String categoriaString;
 
+    @NotNull(message = "El nombre de la ciudad no puede ser nulo")
+    @JsonProperty("ubicacion")
+    private String ubicacionString;
+
     // private Long categoriaId;
 
     @Valid

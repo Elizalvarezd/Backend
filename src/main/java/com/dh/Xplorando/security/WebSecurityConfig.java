@@ -58,9 +58,9 @@ public class WebSecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers("/auth/**", "/roles/create-new-role","/users/**", "/productos/**","/categorias/listar","/caracteristicas/listar","/reservas/**" ,"/swagger-ui/*", "/v3/api-docs/*", "/swagger-ui.html").permitAll()// Permitir acceso sin autenticación a URLs específicas
+                        .requestMatchers("/auth/**", "/roles/**","/users/**", "/productos/**","/categorias/**","/caracteristicas/**","/reservas/**","/imagenes/**","/ubicaciones/**","/swagger-ui/*", "/v3/api-docs/*", "/swagger-ui.html").permitAll()// Permitir acceso sin autenticación a URLs específicas
 
-                        .requestMatchers("/auth/**","/roles/**","/users/**","/productos/**","/reservas/listar","/imagenes/**", "/reservas/**","/categorias/**","/caracteristicas/**").hasRole("ADMIN")// Requiere rol ADMIN para URLs específicas
+                        .requestMatchers("/auth/**","/roles/**","/users/**","/productos/**","/categorias/**","/caracteristicas/**","/reservas/**","/imagenes/**","/ubicaciones/**").hasRole("ADMIN")// Requiere rol ADMIN para URLs específicas
 
                         .anyRequest().authenticated());// Requiere autenticación para todas las demás URLs
 
